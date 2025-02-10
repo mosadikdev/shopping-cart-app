@@ -1,9 +1,11 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { removeItem, increaseQuantity, decreaseQuantity, applyDiscount } from './cartSlice';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Cart = () => {
-  const { items, discount, taxRate } = useSelector(state => state.cart);
+  const { items, discount, taxRate } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -17,7 +19,7 @@ const Cart = () => {
         <p className="text-gray-500">Your cart is empty</p>
       ) : (
         <ul>
-          {items.map(item => (
+          {items.map((item) => (
             <li key={item.id} className="flex justify-between items-center mb-4 p-2 border-b">
               <div className="flex-1">
                 <span className="font-semibold">{item.name}</span>
@@ -25,20 +27,29 @@ const Cart = () => {
               </div>
               <div className="flex items-center space-x-4">
                 <button
-                  onClick={() => dispatch(decreaseQuantity(item.id))}
-                  className="bg-gray-200 text-gray-700 px-2 py-1 rounded"
+                  onClick={() => {
+                    dispatch(decreaseQuantity(item.id));
+                    toast.info('Quantity decreased');
+                  }}
+                  className="px-3 py-1 bg-gray-200 rounded-l hover:bg-gray-300"
                 >
                   -
                 </button>
-                <span>{item.quantity}</span>
+                <span className="px-4 bg-gray-100">{item.quantity}</span>
                 <button
-                  onClick={() => dispatch(increaseQuantity(item.id))}
-                  className="bg-gray-200 text-gray-700 px-2 py-1 rounded"
+                  onClick={() => {
+                    dispatch(increaseQuantity(item.id));
+                    toast.success('Quantity increased');
+                  }}
+                  className="px-3 py-1 bg-gray-200 rounded-r hover:bg-gray-300"
                 >
                   +
                 </button>
                 <button
-                  onClick={() => dispatch(removeItem(item.id))}
+                  onClick={() => {
+                    dispatch(removeItem(item.id));
+                    toast.error(`${item.name} removed from cart`);
+                  }}
                   className="bg-red-500 text-white px-2 py-1 rounded"
                 >
                   Remove
@@ -49,7 +60,9 @@ const Cart = () => {
         </ul>
       )}
       <div className="mt-6">
-        <label htmlFor="discount" className="block text-sm font-medium text-gray-700">Discount (%):</label>
+        <label htmlFor="discount" className="block text-sm font-medium text-gray-700">
+          Discount (%):
+        </label>
         <input
           type="number"
           id="discount"
@@ -78,6 +91,7 @@ const Cart = () => {
           <span>${total.toFixed(2)}</span>
         </div>
       </div>
+      <ToastContainer position="bottom-right" />
     </div>
   );
 };
